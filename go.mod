@@ -1,6 +1,7 @@
 module github.com/vpereira/trivy_runner
 
 go 1.21
+toolchain go1.22.5
 
 require (
 	github.com/alicebob/miniredis/v2 v2.33.0
@@ -8,7 +9,7 @@ require (
 	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/redis/go-redis/v9 v9.7.0
-	go.uber.org/mock v0.4.0
+	go.uber.org/mock v0.5.0
 	go.uber.org/zap v1.27.0
 )
 
