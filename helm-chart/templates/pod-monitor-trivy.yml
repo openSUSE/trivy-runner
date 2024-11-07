@@ -1,0 +1,40 @@
+{{- if .Values.metrics.enabled -}}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ include "trivy-runner.fullname" . }}
+  labels:
+    {{- include "trivy-runner.selectorLabels" . | nindent 4 }}
+    release: kube-prometheus-stack # this is required by IT's prometheus-operator
+spec:
+  jobLabel: {{ include "trivy-runner.fullname" . }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  podMetricsEndpoints:
+  - interval: 30s
+    path: /metrics
+    # TODO: change this when trivy gets a dedicated port for metrics.
+    port: http-webapi
+    scrapeTimeout: 10s
+  - interval: 30s
+    path: /metrics
+    port: http-scanworker
+  - interval: 30s
+    path: /metrics
+    port: http-pullworker
+  - interval: 30s
+    path: /metrics
+    port: http-pushworker
+  - interval: 30s
+    path: /metrics
+    port: http-sizeworker
+  - interval: 30s
+    path: /metrics
+    port: tcp-redisexp
+  selector:
+    matchLabels:
+      {{- include "trivy-runner.selectorLabels" . | nindent 6 }}
+{{- end }}

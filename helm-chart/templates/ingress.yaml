@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled -}}
+---
+{{ $name := include "trivy-runner.fullname" . }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ $name }}
+  annotations:
+    {{- toYaml .Values.ingress.annotations  | nindent 4 }}
+spec:
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- toYaml .Values.ingress.tls | nindent 4 }}
+
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $name }}
+                port:
+                  name: http-webapi
+    {{- end }}
+{{- end }}

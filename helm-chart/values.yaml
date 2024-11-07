@@ -1,0 +1,120 @@
+# Default values for trivy-runner.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+metrics:
+  port: 9394
+  enabled: true
+
+image:
+  pullPolicy: Always
+  registry: registry.opensuse.org
+  repository: systemsmanagement/scc/containers/containers/scc/trivy-runner
+  tag: v1.0
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podSpec:
+  readinessGates: []
+  tolerations: []
+  affinity: {}
+  dnsPolicy: ~
+  dnsConfig: ~
+
+ingress:
+  enabled: false
+  hosts: []
+  tls: []
+  annotations: {}
+
+secrets:
+  sentryDsn: ~
+
+replicas: 1
+
+pvc:
+  enabled: false
+  storageClass: ""
+  capacity: 5G
+  accessModes:
+    - ReadWriteOnce
+
+service:
+  port: 8080
+  type: ClusterIP
+
+redis:
+  image:
+    registry: registry.opensuse.org
+    repository: opensuse/redis
+    tag: 7.2.5
+  resources:
+    limits:
+      cpu: 120m
+      memory: 256M
+    requests:
+      cpu: 100m
+      memory: 128M
+
+getsizeworker:
+  resources:
+    limits:
+      cpu: 120m
+      memory: 512M
+    requests:
+      cpu: 100m
+      memory: 64M
+
+pullworker:
+  resources:
+    limits:
+      cpu: 120m
+      memory: 512M
+    requests:
+      cpu: 100m
+      memory: 64M
+
+pushworker:
+  enabled: true
+  webhookUrl: "https://your-domain-here.com/webhook"
+  resources:
+    limits:
+      cpu: 120m
+      memory: 128M
+    requests:
+      cpu: 100m
+      memory: 32M
+
+scanworker:
+  pushToCatalog: false
+  scanParallelism: 0 # autodetect
+  scanTimeout: "5m"
+
+  resources:
+    limits:
+      cpu: 250m
+      memory: 1G
+    requests:
+      cpu: 130m
+      memory: 128M
+
+webapi:
+  resources:
+    limits:
+      cpu: 120m
+      memory: 256M
+    requests:
+      cpu: 100m
+      memory: 128M
+
+redisexporter:
+  resources:
+    limits:
+      cpu: 120m
+      memory: 256M
+    requests:
+      cpu: 100m
+      memory: 128M

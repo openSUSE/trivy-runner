@@ -1,0 +1,11 @@
+# TODO: Upstream this check.
+
+customChecks:
+  - name: env-cross-check
+    template: env-value-from
+    remediation: >
+      Double check the name/key for typos in the env[*].valueFrom.
+
+checks:
+  exclude:
+    - no-read-only-root-fs

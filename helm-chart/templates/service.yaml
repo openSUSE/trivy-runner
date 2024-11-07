@@ -1,0 +1,19 @@
+{{- if .Values.service.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ include "trivy-runner.fullname" . }}
+  labels:
+    {{- include "trivy-runner.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http-webapi
+      port: {{ .Values.service.port }}
+      targetPort: http-webapi
+      protocol: TCP
+  selector:
+    {{- include "trivy-runner.selectorLabels" . | nindent 6 }}
+{{- end }}

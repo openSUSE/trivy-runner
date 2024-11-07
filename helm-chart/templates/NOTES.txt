@@ -1,0 +1,20 @@
+{{- $root := . -}}
+=== Trivy Runer Deployment ===
+  {{- if $root.Values.ingress.enabled }}
+
+  TLS Endpoints:
+
+  {{- range $entry := $root.Values.ingress.tls }}
+    {{- range $entry.hosts  }}
+    - https://{{ . }}
+    {{- end }}
+  {{- end }}
+
+  {{- $ingressStatus := (lookup "networking.k8s.io/v1" "Ingress" $root.Release.Namespace (include "trivy-runner.fullname" $root)).status -}}
+  {{- with $ingressStatus }}
+  Ingress Load Balancer endpoints:
+  {{- range .loadBalancer.ingress }}
+    - {{ .hostname }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
