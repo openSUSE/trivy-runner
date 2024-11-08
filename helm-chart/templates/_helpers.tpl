@@ -27,6 +27,29 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Namespace
+*/}}
+{{- define "trivy-runner.namespace" -}}
+{{- if (and .Values.namespace.create .Values.namespace.name) }}
+{{- .Values.namespace.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{/*
+Namespace
+*/}}
+{{- define "trivy-runner.serviceAccountName" -}}
+{{- if (and .Values.serviceAccount.create .Values.serviceAccount.name) }}
+{{- .Values.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" (include "trivy-runner.name" .) "sa" | trunc 63 }}
+{{- end }}
+{{- end }}
+
+
+{{/*
 Labels - Trivy
 */}}
 {{- define "trivy-runner.labels" -}}

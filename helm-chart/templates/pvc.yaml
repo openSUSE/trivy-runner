@@ -3,8 +3,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "trivy-runner.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "trivy-runner.name" . }}
+  namespace: {{ include "trivy-runner.namespace" . }}
 spec:
   accessModes:
     {{- toYaml .Values.pvc.accessModes | nindent 4 }}

@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+namespace:
+  create: false
+  name: ~
+
 metrics:
   port: 9394
   enabled: true
@@ -13,7 +17,7 @@ image:
   tag: v1.0
 
 serviceAccount:
-  create: false
+  create: true
   annotations: {}
   name: ""
 
@@ -45,6 +49,8 @@ pvc:
 service:
   port: 8080
   type: ClusterIP
+
+environment: production
 
 redis:
   image:

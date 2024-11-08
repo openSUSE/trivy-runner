@@ -3,8 +3,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Release.Namespace }}
-  name: {{ include "trivy-runner.fullname" . }}
+  namespace: {{ include "trivy-runner.namespace" . }}
+  name: {{ include "trivy-runner.name" . }}
   labels:
     {{- include "trivy-runner.labels" . | nindent 4 }}
 spec:
