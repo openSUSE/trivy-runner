@@ -8,7 +8,7 @@ namespace:
 
 metrics:
   port: 9394
-  enabled: true
+  enabled: false
 
 image:
   pullPolicy: Always
@@ -85,7 +85,7 @@ pullworker:
 
 pushworker:
   enabled: true
-  webhookUrl: "https://your-domain-here.com/webhook"
+  webhookUrl: "http://your-domain-here.com/webhook"
   resources:
     limits:
       cpu: 120m
