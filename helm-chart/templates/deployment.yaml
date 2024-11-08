@@ -187,9 +187,6 @@ spec:
           env:
             {{- include "trivy-runner.redisEnv" . | nindent 12 }}
             {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
-          ports:
-            - containerPort: {{ .Values.redis.port }}
-              name: tcp-redis
           {{- with .Values.redis.resources }}
           volumeMounts:
             - name: redis-storage

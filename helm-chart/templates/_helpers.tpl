@@ -54,7 +54,7 @@ Common environment variables among trivy containers
 - name: REDIS_HOST
   value: localhost
 - name: REDIS_PORT
-  value: {{ .Values.redis.port | quote }}
+  value: "6379"
 {{- end -}}
 
 {{/*
