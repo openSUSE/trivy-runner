@@ -84,7 +84,7 @@ pullworker:
       memory: 64M
 
 pushworker:
-  enabled: true
+  enabled: false
   webhookUrl: "http://your-domain-here.com/webhook"
   resources:
     limits:
