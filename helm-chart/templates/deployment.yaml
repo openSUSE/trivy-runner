@@ -1,0 +1,200 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ include "trivy-runner.namespace" . }}
+  name: {{ include "trivy-runner.name" . }}
+  labels:
+    {{- include "trivy-runner.selectorLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  serviceAccountName: {{ include "trivy-runner.serviceAccountName" . }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "trivy-runner.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "trivy-runner.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+      volumes:
+        - name: trivy-pool
+        {{- if .Values.pvc.enabled }}
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  {{- toYaml .Values.pvc.accessModes | nindent 18 }}
+                volumeMode: Filesystem
+                storageClassName: {{ .Values.pvc.storageClass }}
+                resources:
+                  requests:
+                  {{- with .Values.pvc.capacity | default "1Gi" }}
+                    storage: {{ . }}
+                  {{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: redis-storage
+          emptyDir: {}
+      {{- with .Values.podSpec.affinity }}
+      affinity:
+        {{- tpl (. | toYaml) $ | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.podSpec.tolerations }}
+      tolerations:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.podSpec.dnsConfig }}
+      dnsConfig:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.podSpec.dnsPolicy }}
+      dnsPolicy: {{ . }}
+      {{- end }}
+
+      containers:
+        - name: getsizeworker
+          image: {{ include "trivy-runner.fullImageName" .Values.image }}
+          imagePullPolicy: Always
+          command:
+            - getsizeworker
+          env:
+            {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
+            {{- include "trivy-runner.redisEnv" . | nindent 12 }}
+          volumeMounts:
+            - name: trivy-pool
+              mountPath: /pool/
+          {{- with .Values.getsizeworker.resources }}
+          ports:
+            - containerPort: 8084
+              # it should be called http-getsizeworker
+              # but we can't, because of 15 chars limitation
+              name: http-sizeworker
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        - name: pullworker
+          image: {{ include "trivy-runner.fullImageName" .Values.image }}
+          imagePullPolicy: Always
+          command:
+            - pullworker
+          env:
+            {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
+            {{- include "trivy-runner.redisEnv" . | nindent 12 }}
+          volumeMounts:
+            - name: trivy-pool
+              mountPath: /pool/
+          {{- with .Values.pullworker.resources }}
+          ports:
+            - containerPort: 8082
+              name: http-pullworker
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- if .Values.pushworker.enabled }}
+        - name: pushworker
+          image: {{ include "trivy-runner.fullImageName" .Values.image }}
+          imagePullPolicy: Always
+          command:
+            - pushworker
+          env:
+            {{- include "trivy-runner.redisEnv" . | nindent 12 }}
+            {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
+            {{- include "trivy-runner.pushworkerEnv" . | nindent 12 }}
+          ports:
+            - containerPort: 8083
+              name: http-pushworker
+          volumeMounts:
+            - name: trivy-pool
+              mountPath: /pool/
+           {{- with .Values.pushworker.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        - name: scanworker
+          image: {{ include "trivy-runner.fullImageName" .Values.image }}
+          imagePullPolicy: Always
+          command:
+            - scanworker
+          env:
+            {{- include "trivy-runner.redisEnv" . | nindent 12 }}
+            {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
+            {{- include "trivy-runner.scanworkerEnv" . | nindent 12 }}
+          ports:
+            - containerPort: 8081
+              name: http-scanworker
+          volumeMounts:
+            - name: trivy-pool
+              mountPath: /pool/
+          {{- with .Values.scanworker.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+        - name: webapi
+          image: {{ include "trivy-runner.fullImageName" .Values.image }}
+          imagePullPolicy: Always
+          command:
+            - webapi
+          env:
+            {{- include "trivy-runner.redisEnv" . | nindent 12 }}
+            {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
+          ports:
+            - containerPort: 8080
+              name: http-webapi
+          volumeMounts:
+            - name: trivy-pool
+              mountPath: /pool/
+          {{- with .Values.webapi.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+        - name: redisexporter
+          image: {{ include "trivy-runner.fullImageName" .Values.image }}
+          imagePullPolicy: Always
+          command:
+            - redisexporter
+          env:
+            {{- include "trivy-runner.redisEnv" . | nindent 12 }}
+            {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
+            - name: REDIS_QUEUES
+              value: topull toscan getsize topush
+          ports:
+            - containerPort: 8086
+              name: tcp-redisexp # tcp-redisexporter
+          {{- with .Values.redisexporter.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+        - name: redis
+          image: {{ include "trivy-runner.fullImageName" .Values.redis.image }}
+          imagePullPolicy: Always
+          command:
+            - redis-server
+          workingDir: /data
+          env:
+            {{- include "trivy-runner.redisEnv" . | nindent 12 }}
+            {{- include "trivy-runner.trivyEnv" . | nindent 12 }}
+          {{- with .Values.redis.resources }}
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
+          securityContext:
+            runAsUser: 101 # redis user
+            runAsGroup: 101
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

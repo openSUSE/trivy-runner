@@ -1,0 +1,18 @@
+{{- if .Values.pvc.enabled -}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "trivy-runner.name" . }}
+  namespace: {{ include "trivy-runner.namespace" . }}
+spec:
+  accessModes:
+    {{- toYaml .Values.pvc.accessModes | nindent 4 }}
+  volumeMode: Filesystem
+  storageClassName: {{ .Values.pvc.storageClass }}
+  resources:
+    requests:
+    {{- with .Values.pvc.capacity | default "1Gi" }}
+      storage: {{ . }}
+    {{- end }}
+{{- end }}

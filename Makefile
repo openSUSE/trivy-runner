@@ -35,3 +35,6 @@ integration-server:
 
 lint:
 	docker run --rm -v "$(CURDIR):/app" -w /app golangci/golangci-lint:v1.55.2 golangci-lint run -v
+
+helm-template:
+	@helm template $(HELM_ARGS) "trivy-runner" helm-chart/
