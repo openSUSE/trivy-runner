@@ -1,7 +1,8 @@
+#!BuildTag: trivy-runner:0.1.2
 ---
 apiVersion: v2
 name: trivy-runner
-description: A Helm chart for Registry Catalog
+description: A Helm chart for trivy runner
 type: application
 version: 0.1.2
 appVersion: 1.0.1
