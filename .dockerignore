@@ -1,1 +1,4 @@
 images/trivy-scan-*
+pool/
+trivy-reports/
+helm-charts/
