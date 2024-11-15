@@ -95,7 +95,6 @@ pushworker:
       memory: 32M
 
 scanworker:
-  pushToCatalog: false
   scanParallelism: 0 # autodetect
   scanTimeout: "5m"
 
