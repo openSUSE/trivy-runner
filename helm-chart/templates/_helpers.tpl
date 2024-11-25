@@ -89,7 +89,7 @@ Errbit variables. For now we reuse main Rails app Errbit keys
 {{- end -}}
 
 {{- define "trivy-runner.scanworkerEnv" -}}
-{{- if .Values.scanworker.pushToCatalog }}
+{{- if .Values.pushworker.enabled }}
 - name: PUSH_TO_CATALOG
   value: "true"
 {{- end }}
@@ -128,10 +128,6 @@ Errbit variables. For now we reuse main Rails app Errbit keys
 
 - name: REPORTS_APP_DIR
   value: /pool/reports
-{{- if .Values.pushworker.enabled }}
-- name: PUSH_TO_CATALOG
-  value: "1"
-{{- end }}
 {{- end -}}
 
 {{/*

@@ -14,7 +14,7 @@ image:
   pullPolicy: Always
   registry: registry.opensuse.org
   repository: systemsmanagement/scc/containers/containers/scc/trivy-runner
-  tag: v1.0
+  tag: "1.0"
 
 serviceAccount:
   create: true
@@ -60,7 +60,7 @@ redis:
   resources:
     limits:
       cpu: 120m
-      memory: 256M
+      memory: 128M
     requests:
       cpu: 100m
       memory: 128M
@@ -69,7 +69,7 @@ getsizeworker:
   resources:
     limits:
       cpu: 120m
-      memory: 512M
+      memory: 256M
     requests:
       cpu: 100m
       memory: 64M
@@ -78,7 +78,7 @@ pullworker:
   resources:
     limits:
       cpu: 120m
-      memory: 512M
+      memory: 256M
     requests:
       cpu: 100m
       memory: 64M
@@ -95,7 +95,6 @@ pushworker:
       memory: 32M
 
 scanworker:
-  pushToCatalog: false
   scanParallelism: 0 # autodetect
   scanTimeout: "5m"
 
@@ -111,16 +110,18 @@ webapi:
   resources:
     limits:
       cpu: 120m
-      memory: 256M
+      memory: 128M
     requests:
       cpu: 100m
-      memory: 128M
+      memory: 32M
 
 redisexporter:
   resources:
     limits:
       cpu: 120m
-      memory: 256M
+      memory: 128M
     requests:
       cpu: 100m
-      memory: 128M
+      memory: 64M
+
+extraObjects: []
