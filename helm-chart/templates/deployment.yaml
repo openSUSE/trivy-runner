@@ -26,6 +26,9 @@ spec:
       volumes:
         - name: trivy-pool
         {{- if .Values.pvc.enabled }}
+            persistentVolumeClaim:
+            claimName: {{ include "trivy-runner.name" . }}
+        {{- else if .Values.ephemeralPvc.enabled }}
           ephemeral:
             volumeClaimTemplate:
               spec:

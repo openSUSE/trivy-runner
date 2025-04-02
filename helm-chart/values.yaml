@@ -39,6 +39,9 @@ secrets:
 
 replicas: 1
 
+ephemeralPvc:
+  enabled: false
+
 pvc:
   enabled: false
   storageClass: ""
