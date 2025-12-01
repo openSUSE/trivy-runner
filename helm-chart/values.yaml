@@ -13,7 +13,7 @@ metrics:
 image:
   pullPolicy: Always
   registry: registry.opensuse.org
-  repository: registry.opensuse.org/systemsmanagement/scc/containers/15.6/scc/trivy-runner
+  repository: systemsmanagement/scc/containers/15.6/scc/trivy-runner
   tag: "v1.0"
 
 serviceAccount:
