@@ -15,11 +15,11 @@ To set up the Trivy Runner on your local machine, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/vpereira/trivy_runner.git
+   git clone git@github.com:openSUSE/trivy-runner.git
    ```
 2. Navigate to the project directory:
    ```
-   cd trivy_runner
+   cd trivy-runner
    ```
 3. Build the application:
    ```
